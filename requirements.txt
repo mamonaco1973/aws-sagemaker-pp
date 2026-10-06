@@ -1,0 +1,16 @@
+# The notebook kernel and the demo.py CLI. Python 3.10, 3.11 or 3.12
+# (scikit-learn 1.4.2 publishes no wheels for 3.13+).
+#
+# numpy, pandas, scikit-learn and joblib match the SageMaker scikit-learn
+# 1.4-2-py312 container (see ml/requirements.txt). They have to: the
+# notebook unpickles the model.joblib that container produced, and a pickle
+# of scikit-learn objects is only reliably readable by the same scikit-learn.
+# numpy is pinned exactly so the seeded dataset is identical everywhere.
+boto3==1.43.108
+numpy==2.1.0
+pandas==2.3.2
+scikit-learn==1.4.2
+scipy==1.14.1
+joblib==1.5.2
+matplotlib==3.9.2
+ipykernel==6.29.5

@@ -1,0 +1,11 @@
+# Copy to terraform.tfvars (gitignored) and edit. Every value shown is the
+# default, so an absent terraform.tfvars deploys exactly this.
+
+region                       = "us-east-1"
+prefix                       = "sagemaker-pp"
+notebook_instance_type       = "ml.t3.medium"
+notebook_volume_gb           = 10
+training_instance_type       = "ml.m5.large"
+training_max_runtime_seconds = 900
+serverless_memory_mb         = 2048
+serverless_max_concurrency   = 1

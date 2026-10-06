@@ -1,0 +1,10 @@
+# What the SageMaker scikit-learn 1.4-2-py312 container ships (Python 3.12),
+# from the container's own requirements.txt at tag v1.4-2-py312. This file is
+# NOT installed in SageMaker -- the image already has these. It pins the
+# local test environment to the same versions, so a model trained and
+# reloaded locally behaves as it will in the training job and the endpoint.
+numpy==2.1.0
+pandas==2.3.2
+scikit-learn==1.4.2
+scipy==1.14.1
+joblib==1.5.2
