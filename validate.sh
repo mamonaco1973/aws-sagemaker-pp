@@ -101,12 +101,25 @@ cat <<EOF
 
 SageMaker Random Forest Demo
 ============================
-JupyterLab : https://${NOTEBOOK}.notebook.${REGION}.sagemaker.aws/lab
-             (sign in to the AWS console first)
 MCP URL    : ${MCP_URL}
-             (claude.ai: Settings > Connectors > Add custom connector; sign up on first connect)
+             claude.ai: Settings > Connectors > Add custom connector
+             (sign up on first connect)
 MCP check  : ${PREDICTION}
 Bucket     : s3://${BUCKET}
+
+Opening the notebook
+--------------------
+For yourself: use the console.
+  SageMaker AI > Notebooks > ${NOTEBOOK} > Open JupyterLab
+  mints a fresh presigned URL from your console login every time,
+  so you never handle one yourself. That's the intended flow.
+
+For other people, the AWS-native options:
+  - IAM Identity Center (SSO): grant console access with
+    sagemaker:CreatePresignedNotebookInstanceUrl on this notebook;
+    they use the same Open JupyterLab button.
+  - SageMaker Studio: per-user profiles in a domain, signed in
+    through Identity Center, if you outgrow a single notebook.
 
 Notebook costs ~\$0.05/hour while running: python demo.py notebook-stop
 EOF
