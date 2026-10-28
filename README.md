@@ -48,30 +48,23 @@ Key capabilities demonstrated:
 
 ## Architecture
 
-```mermaid
-flowchart LR
-  subgraph TF["Terraform: 01-infrastructure"]
-    NB["Notebook instance<br/>ml.t3.medium"]
-    S3[("S3 bucket<br/>data, code, artifacts")]
-  end
-  subgraph PY["Python: notebook or demo.py"]
-    TJ["Training job<br/>ml.m5.large, then gone"]
-    EP["Serverless endpoint<br/>model + endpoint config"]
-  end
-  NB -- "1 CSV + source" --> S3
-  NB -- "2 CreateTrainingJob" --> TJ
-  S3 -- "train / test channels" --> TJ
-  TJ -- "3 model.tar.gz" --> S3
-  S3 -- "4 ModelDataUrl" --> EP
-  NB -- "5 InvokeEndpoint (IAM-signed)" --> EP
-  subgraph MCP["Terraform: 02-mcp"]
-    GW["HTTP API + router Lambda<br/>OAuth proxy + MCP"]
-    CG["Cognito<br/>user pool"]
-  end
-  CL["Claude<br/>claude.ai / Desktop"] -- "6 tools/call (Bearer token)" --> GW
-  GW -. "sign-in" .- CG
-  GW -- "7 InvokeEndpoint" --> EP
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="architecture-dark.svg">
+  <img alt="A SageMaker notebook instance, or demo.py from a terminal, uploads a CSV and the training source to an S3 bucket and starts a managed training job, which reads the train and test channels on an ml.m5.large in the AWS scikit-learn container, writes model.tar.gz back to S3 and shuts down. A serverless endpoint loads that artifact through its ModelDataUrl, and the notebook calls it with IAM-signed InvokeEndpoint requests. Claude reaches the same endpoint through a remote MCP connector: an HTTP API in front of a router Lambda that proxies OAuth to a Cognito user pool, keeps OAuth state in DynamoDB, and on tools/call invokes the endpoint with its own role." src="architecture-light.svg">
+</picture>
+
+Regenerate with `python3 make_diagram.py`. The numbers on the diagram:
+
+1. The notebook (or `demo.py`) uploads the CSV and the training source to S3.
+2. It calls `CreateTrainingJob`.
+3. The job reads the train and test channels and writes `model.tar.gz`
+   back to S3, then its compute goes away.
+4. The model's `ModelDataUrl` points the serverless endpoint at that
+   artifact.
+5. The notebook calls `InvokeEndpoint`, signed with its IAM role.
+6. Claude sends `tools/call` to the MCP connector with a Cognito bearer
+   token.
+7. The router Lambda calls `InvokeEndpoint` with its own role.
 
 ### Who owns what
 
@@ -478,6 +471,7 @@ check_env.sh / validate.sh  Tooling and credentials; post-deploy check and quick
 demo.py                     CLI: train, evaluate, artifact, deploy, predict, status, cleanup
 requirements.txt            Notebook kernel and CLI pins (Python 3.10-3.12)
 make_notebook.py            Generates the notebook; edit cells here
+make_diagram.py             Generates architecture-light.svg / architecture-dark.svg
 RECORDING.md                5-8 minute video walkthrough with cut points
 01-infrastructure/          Terraform: bucket, IAM, notebook, lifecycle script
   scripts/on-start.sh       Copies the project, writes demo-config.json, builds the kernel
